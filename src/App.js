@@ -1,25 +1,42 @@
-import logo from './logo.svg';
-import './App.css';
+import React, { useState } from "react";
+import Search from "./component/UI/Search";
+import Button from "./component/UI/Button";
+import SearchList from "./component/SearchList";
 
-function App() {
+import { useDispatch, useSelector } from "react-redux";
+import { searchActions } from "./store";
+
+const App = () => {
+  const [enteredSearch, setEnteredSearch] = useState("");
+  const dispatch = useDispatch();
+  const searchInputsState = useSelector((state) => state);
+  const searchInputs = useSelector((state) => state.searchInputs);
+
+  localStorage.setItem("searchInputs", JSON.stringify(searchInputsState));
+
+  const addSearchHandler = () => {
+    dispatch(searchActions.add({ text: enteredSearch }));
+    setEnteredSearch("");
+  };
+
+  const searchChangeHandler = (event) => {
+    setEnteredSearch(event.target.value);
+  };
+
   return (
-    <div className="App">
-      <header className="App-header">
-        <img src={logo} className="App-logo" alt="logo" />
-        <p>
-          Edit <code>src/App.js</code> and save to reload.
-        </p>
-        <a
-          className="App-link"
-          href="https://reactjs.org"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          Learn React
-        </a>
-      </header>
-    </div>
+    <>
+      <Search
+        onChange={searchChangeHandler}
+        value={enteredSearch}
+        type="text"
+      />
+      <Button onClick={addSearchHandler}>Add</Button>
+
+      {searchInputs.map((search) => (
+        <SearchList key={search.id} search={search} />
+      ))}
+    </>
   );
-}
+};
 
 export default App;
