@@ -8,6 +8,7 @@ import { searchActions } from "./store";
 
 const App = () => {
   const [enteredSearch, setEnteredSearch] = useState("");
+  const [inputError, setInputError] = useState(true);
   const dispatch = useDispatch();
   const searchInputsState = useSelector((state) => state);
   const searchInputs = useSelector((state) => state.searchInputs);
@@ -15,12 +16,19 @@ const App = () => {
   localStorage.setItem("searchInputs", JSON.stringify(searchInputsState));
 
   const addSearchHandler = () => {
-    dispatch(searchActions.add({ text: enteredSearch }));
-    setEnteredSearch("");
+    if (!inputError) {
+      dispatch(searchActions.add({ text: enteredSearch }));
+      setEnteredSearch("");
+      setInputError(true);
+    }
   };
 
   const searchChangeHandler = (event) => {
     setEnteredSearch(event.target.value);
+
+    event.target.value.trim().length > 0
+      ? setInputError(false)
+      : setInputError(true);
   };
 
   return (
@@ -30,7 +38,9 @@ const App = () => {
         value={enteredSearch}
         type="text"
       />
-      <Button onClick={addSearchHandler}>Add</Button>
+      <Button onClick={addSearchHandler} disabled={inputError}>
+        Add
+      </Button>
 
       {searchInputs.map((search) => (
         <SearchList key={search.id} search={search} />
